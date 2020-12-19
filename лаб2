@@ -1,0 +1,407 @@
+#include "stdafx.h"
+#include <iostream>
+#include <stdlib.h>
+#include <time.h>
+#include <math.h>
+
+using namespace std;
+int globalVariable = 6;
+int GetLinkedRoots(int a, int b, int c, double & x1, double & x2);
+
+void Greeting()
+{
+	cout << "Добро пожаловать в лабораторную работу 2!" << endl;
+}
+
+//функция осуществления математических операций
+double MakeCalculation(int value1, int value2, char OperationKey)
+{
+
+	while ((OperationKey != '+') && (OperationKey != '-') && (OperationKey != '*') && (OperationKey != '/') && (OperationKey != '%'))
+	{
+		if (((OperationKey != '+') && (OperationKey != '-') && (OperationKey != '*') && (OperationKey != '/') && (OperationKey != '%')))
+		{
+			cout << "Ошибка! Введите одну из следующих операций: (+, -, *, /, %)" << endl;
+			OperationKey = getchar();
+		}
+
+		switch (OperationKey)
+		{
+		case '+':
+			cout << value1 << " + " << value2 << " = " << value1 + value2 << endl;
+			system("pause");
+			break;
+
+		case '-':
+			cout << value1 << " - " << value2 << " = " << value1 - value2 << endl;
+			system("pause");
+			break;
+
+		case '*':
+			cout << value1 << " * " << value2 << " = " << value1 * value2 << endl;
+			system("pause");
+			break;
+
+		case '/':
+			cout << value1 << " / " << value2 << " = " << value1 / value2 << endl;//выводы вне функции функция как действие
+			system("pause");
+			break;
+
+		case '%':
+			cout << value1 << " % " << value2 << " = " << value1 % value2 << endl;
+			system("pause");
+			break;
+
+		default:
+			return -1;
+			break;
+		}
+	}
+}
+
+//функция получения корней квадратного уравнения
+int GetRoots(int a, int b, int c, double* x1, double* x2)
+{
+	if (a == 0)
+	{
+		if (b == 0)
+		{
+			return 0;
+		}
+
+		*x1 = -c / b;
+		return 1;
+	}
+
+	double D = b*b - 4 * a*c;
+
+	if (D > 0)
+	{
+		*x1 = (-b - sqrt(D)) / (2 * a);
+		*x2 = (-b + sqrt(D)) / (2 * a);
+		return 2;
+	}
+	else if (D == 0)
+	{
+		*x1 = -b / (2 * a);
+		return 1;
+	}
+
+	return 0;
+}
+
+//функции суммирования чисел разных типов для демонстрации перегрузки
+void SummNumbers(int value1, int value2)
+{
+	cout << "Сумма переменных типа integer и double = " << value1 + value2 << endl;
+}
+void SummNumbers(double value1, double value2)
+{
+	cout << "Сумма переменных типа double = " << value1 + value2 << endl;
+}
+void SummNumbers(int value1, double value2)
+{
+	cout << "Сумма переменных типа integer и double = " << value1 + value2 << endl;
+}
+
+//работа с глобальными переменными
+void GlobalPlusTwo()
+{
+	globalVariable += 2;
+	cout << "Значение глобальной переменной на данный момент = " << globalVariable << endl;
+}
+void GlobalMultiplyThree()
+{
+	globalVariable *= 3;
+	cout << "Значение глобальной переменной на данный момент = " << globalVariable << endl;
+}
+void GlobalEqualsOne()
+{
+	globalVariable = 1;
+	cout << "Значение глобальной переменной на данный момент = " << globalVariable << endl;
+}
+
+//функция вычисления степени указанного числа
+int GetPower(int base, int power)
+{
+	if (power == 0)
+		return 1;
+	else if (power < 0)
+	{
+		return 1 / GetPower(base, -power);
+	}
+	else
+	{
+		base*GetPower(base, power - 1);
+	}
+
+}
+
+//функция перемножения матриц
+void MultiplyMassives(double massive1[100][100], double massive2[100][100], double resultMassive[100][100], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		for (int l = 0; l < size; l++)
+		{
+			double sum = 0;
+			for (int j = 0; j < size; j++)
+			{
+				sum += massive1[i][j] * massive2[j][l];
+			}
+			resultMassive[i][l] = sum;
+		}
+	}
+}
+void ShowMatrix(double matrix[100][100], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			cout << matrix[i][j] << " ";
+		}
+		cout << endl;
+	}
+}
+
+//фукции сортировки одномерного массива и вспомогательные функции
+void InsertionSort(double arr[], int size)
+{
+	for (int i = 1; i < size; i++)
+	{
+		for (int j = i; j > 0 && arr[j - 1] > arr[j]; j--)
+		{
+			double temp = arr[j - 1];
+			arr[j - 1] = arr[j];
+			arr[j] = temp;
+		}
+	}
+}
+void InsertionSort2(double* arr, int size)
+{
+	InsertionSort(arr, size);
+}
+
+void ProgrammInterface()
+{
+	cout << "Выберите желаемую задачу: " << endl;
+	cout << "1. Демонстрация функции MakeCalculation." << endl;
+	cout << "2. Функция вычисления корней уравнения - GetRoots." << endl;
+	cout << "3. GetRoots с использованием ссылок." << endl;
+	cout << "4. Демонстрация перегрузки функции." << endl;
+	cout << "5. Использование глобальных переменных." << endl;
+	cout << "6. Рекурсивная функция вычисления степени числа - GetPower." << endl;
+	cout << "7. Вставочная сортировка - 1ый способ." << endl;
+	cout << "8. Вставочная сортировка - 2ой способ." << endl;
+	cout << "9. Функция умножения матриц." << endl;
+	cout << "10. Выход из программы." << endl;
+}
+
+int main()
+{
+	setlocale(LC_CTYPE, "rus");
+	srand(time(NULL));
+	char mathKey;
+	int switcher = NULL;
+	int opValue1, opValue2, opValue3;
+	double x1, x2;
+	float fltValue1, fltValue2;
+	x1 = NULL, x2 = NULL;
+	double mass[100];
+	double matrix1[100][100];
+	double matrix2[100][100];
+	double matrixResult[100][100];
+	for (int i = 0; i < 100; i++)
+	{
+		mass[i] = NULL;
+	}
+
+	Greeting();
+	system("pause");
+	do
+	{
+		system("cls");
+		ProgrammInterface();
+		cin >> switcher;
+		switch (switcher)
+		{
+		case 1:
+		{
+				  cout << "Введите числа для математической операции через пробел: " << endl;
+				  cin >> opValue1 >> opValue2;
+				  cout << "Введите требуемую математическую операцию: " << 
+					  endl << "(Подсказка: Это может быть только (+, -, *, /, %)" << endl;
+				  mathKey = getchar();
+				  MakeCalculation(opValue1, opValue2, mathKey);
+				  break;
+		}
+		case 2:
+		{
+				  cout << "Введите числа A, B и С через пробел соответственно: " << endl;
+				  cin >> opValue1 >> opValue2 >> opValue3;
+				  int count = GetRoots(opValue1, opValue2, opValue3, &x1, &x2);
+				  if (count == 2)
+					  cout << x1 << ", " << x2 << endl;
+				  else if (count == 1)
+					  cout << x1 << " (одно значение)" << endl;
+				  else if (count == 0)
+					  cout << "Нет корней!" << endl;
+				  else if (count == 3)
+					  cout << "Бесконечность решений!" << endl;
+				  else
+					  cout << "ERR" << endl;
+				  system("pause");
+				  break;
+		}
+		case 3:
+		{
+				  double x1 = NULL, x2 = NULL;
+				  cout << "Введите числа A, B и С через пробел соответственно: " << endl;
+				  cin >> opValue1 >> opValue2 >> opValue3;
+				  int count = GetLinkedRoots(opValue1, opValue2, opValue3, x1, x2);
+				  if (count == 2)
+					  cout << x1 << " " << x2 << endl;
+				  else if (count == 1)
+					  cout << x1 << " (одно значение)" << endl;
+				  else if (count == 0)
+					  cout << "Нет корней!" << endl;
+				  else if (count == 3)
+					  cout << "Бесконечность решений!" << endl;
+				  else
+					  cout << "ERROR" << endl;
+				  system("pause");
+				  break;
+		}
+		case 4:
+		{
+				  cout << "Перегрузка функций: " << endl;
+				  opValue1 = 1, opValue2 = 2;
+				  SummNumbers(opValue1, opValue2);
+				  x1 = 3.0, x2 = 4.0;
+				  SummNumbers(x1, x2);
+				  fltValue1= 5.0, fltValue2 = 6.0;
+				  SummNumbers(fltValue1, fltValue2);
+				  system("pause");
+				  break;
+		}
+		case 5:
+		{
+				  cout << "Работа с глобальными числами:" << endl;
+				  GlobalPlusTwo();
+				  GlobalMultiplyThree();
+				  GlobalEqualsOne();
+				  system("pause");
+				  break;
+		}
+		case 6:
+		{
+				  cout << "Введите возводимое в степень целое число:" << endl;
+				  cin >> opValue1;
+				  cout << "Введите целую степень, в которую требуется возвести число:" << endl;
+				  cin >> opValue2;
+				  cout << "Результат: " << GetPower(opValue1, opValue2) << endl;
+				  system("pause");
+				  break;
+		}
+		case 7:
+		{
+				  cout << "Сортировка массива - 1ый вариант передачи." << endl;
+				  cout << "Введите размер массива(1-100):" << endl;
+				  cin >> opValue1;
+				  cout << "Массив с вещественным типом данных:" << endl;
+				  for (int i = 0; i < opValue1; ++i)
+				  {
+					  mass[i] = rand() % 10;
+					  cout << mass[i] << "; ";
+				  }cout << endl;
+				  InsertionSort(mass, opValue1);
+				  cout << "Результат: " << endl;
+				  for (int i = 0; i < opValue1; ++i)
+				  {
+					  cout << mass[i] << "; ";
+				  }cout << endl;
+				  system("pause");
+				  break;
+		}
+		case 8:
+		{
+				  cout << "Сортировка массива - 2ый вариант передачи." << endl;
+				  cout << "Введите размер массива(1-100):" << endl;
+				  cin >> opValue1;
+				  cout << "Массив с вещественным типом данных:" << endl;
+				  for (int i = 0; i < opValue1; ++i)
+				  {
+					  mass[i] = rand() % 10;
+					  cout << mass[i] << "; ";
+				  }cout << endl;
+				  InsertionSort2(mass, opValue1);
+				  cout << "Результат: " << endl;
+				  for (int i = 0; i < opValue1; ++i)
+				  {
+					  cout << mass[i] << "; ";
+				  }cout << endl;
+				  system("pause");
+				  break;
+		}
+		case 9:
+		{
+				  cout << "Введите размер матриц: "<<endl
+					  << "(Чтобы матрицы можно было умножить они должны иметь одинаковый размер)" << endl;
+				  cin >> opValue1;
+				  for (int i = 0; i < opValue1; i++)
+				  {
+					  for (int j = 0; j < opValue1; j++)
+					  {
+						  matrix1[i][j] = rand() % 100;
+						  matrix2[i][j] = rand() % 100;
+					  }
+				  }
+				  cout << "A:" << endl;
+				  ShowMatrix(matrix1, opValue1);
+				  cout << endl << "B:" << endl;
+				  ShowMatrix(matrix2, opValue1);
+				  MultiplyMassives(matrix1, matrix2, matrixResult, opValue1);
+				  cout << endl << "A*B:" << endl;
+				  ShowMatrix(matrixResult, opValue1);
+				  system("pause");
+				  break;
+		}
+		default:
+			break;
+		}
+	} while (switcher != 10);
+}
+
+//функция получения корней квадратного уравнения с использованием указателей
+int GetLinkedRoots(int a, int b, int c, double & x1, double & x2)
+{
+	{
+		if (a == 0)
+		{
+			if (b == 0)
+				return 0;
+			else
+			{
+				x1 = -c / b;
+				return 1;
+			}
+		}
+		else
+		{
+			double D = b*b - 4 * a*c;
+			if (D > 0)
+			{
+				x1 = (-b - sqrt(D)) / (2 * a);
+				x2 = (-b + sqrt(D)) / (2 * a);
+				return 2;
+			}
+			else if (D == 0)
+			{
+				x1 = -b / (2 * a);
+				return 1;
+			}
+			return 0;
+		}
+	}
+}
