@@ -1,0 +1,401 @@
+#include "stdafx.h"
+#include "PersonList.h"
+#include <random>
+#include <ctime>
+
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+    srand(time(NULL));
+
+    PersonList PL;
+    PL.Menu();
+
+    return 0;
+}
+
+
+
+#include "stdafx.h"
+#include "Person.h"
+
+Person::Person(char* name, char* surname, int age, Sex sex)
+{
+    SetName(name);
+    SetSurname(surname);
+    SetAge(age);
+    SetSex(sex);
+};
+
+void Person::SetName(char* name)//здесь должна быть проверка
+{
+    _name = name;
+}
+
+void Person::SetSurname(char* surname)
+{
+    _surname = surname;
+}
+
+void Person::SetAge(int age)
+{
+    _age = age;
+
+}
+void Person::SetSex(Sex sex)
+{
+    _sex = sex;
+}
+
+char* Person::GetName()
+{
+    return _name;
+}
+char* Person::GetSurname()
+{
+    return _surname;
+}
+int Person::GetAge()
+{
+    return _age;
+}
+Sex Person::GetSex()
+{
+    return _sex;
+}
+Person::~Person()
+{
+	_name = NULL;
+	_surname = NULL;
+	delete _name;
+    delete _surname;
+};
+
+
+#include "stdafx.h"
+#include <cstdlib>
+#include "PersonList.h"
+
+HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+void ChangeFont(ConsoleColor color)
+{
+    SetConsoleTextAttribute(hConsole, (WORD)((Black << 4) | (color)));
+}
+
+Person* PersonList::ReadPerson()
+{
+    Person* person = new Person;
+    char* name = new char[20];
+    char* surname = new char[20];
+    cout << "Фамилия: ";
+    cin >> surname;
+    person->SetSurname(surname);
+    cout << "Имя: ";
+    cin >> name;
+    person->SetName(name);
+    cout << "Пол:\n1. Мужчина\n2. Женщина" << endl;
+    int sex = 0;
+    while (sex != Male && sex != Female)
+    {
+        sex = _getch();
+        switch (sex)
+        {
+        case '1':
+        {
+            sex = Male;
+            break;
+        }
+
+        case '2':
+        {
+            sex = Female;
+            break;
+        }
+
+        default:
+            break;
+        }
+        if (sex == Male || sex == Female)
+            break;
+        else
+            cout << "Пожалуйста, введите цифру 1 или 2 в завимости от пола: " << endl;
+    }
+    person->SetSex(Sex(sex));
+    cout << "Возраст: ";
+    int age;
+    cin >> age;
+    person->SetAge(age);
+    return person;
+}
+
+void PersonList::ShowPerson(Person* person)
+{
+    cout << "Фамлия: " << person->GetSurname() << endl;
+    cout << "Имя: " << person->GetName() << endl;
+    cout << "Возраст: " << person->GetAge() << endl;
+    if (person->GetSex() == 1)
+        cout << "Пол: " << "Мужской" << endl << endl;
+    else
+        cout << "Пол: " << "Женский" << endl << endl;
+}
+
+void PersonList::ShowList()
+{
+    PersonListItem* temp = _head;
+    int i = 0;
+    if (temp == NULL)
+        cout << "Список пуст!" << endl;
+    while (temp != NULL)
+    {
+        cout << "Человек №" << ++i << ":" << endl;
+        ShowPerson(&temp->person);
+        temp = temp->next;
+    }
+    cout << endl << endl;
+}
+
+void PersonList::Add(Person* person)
+{
+    PersonListItem* temp = new PersonListItem();
+    temp->person = *person;
+    if (_head != NULL)
+    {
+        temp->prev = _tail;
+        _tail->next = temp;
+        _tail = temp;
+    }
+    else
+        _head = _tail = temp;
+    _count++;
+}
+
+Person* PersonList::Find(int index)
+{
+    PersonListItem* temp = _head;
+    int count = 0;
+    while (temp != NULL)
+    {
+        if (count == index)
+        {
+            return &temp->person;
+        }
+        temp = temp->next;
+        count++;
+    }
+    return NULL;
+}
+
+void PersonList::RemoveAt(int index)
+{
+    Person* person = Find(index);
+    PersonListItem* temp = _head;
+    char name[] = "qwerty";
+    person->SetName(name);
+    while (temp != NULL)
+    {
+        if (&temp->person == person)
+        {
+            if (_head == temp)
+            {
+                if (temp->next == NULL)
+                {
+                    _head = NULL;
+                    _tail = NULL;
+                }
+                _head->next->prev = NULL;
+                _head = _head->next;
+            }
+            if (_tail == temp)
+            {
+                _tail->prev->next = NULL;
+                _tail = _tail->prev;
+            }
+            if (_head != temp && _tail != temp)
+            {
+                temp->prev->next = temp->next;
+                temp->next->prev = temp->prev;
+            }
+        }
+        temp = temp->next;
+    }
+    _count--;
+}
+
+void PersonList::Clear()
+{
+	PersonListItem* next = _head;
+	while (next != NULL)
+	{
+		PersonListItem* tempNext = next->next;
+		delete next;
+		next = tempNext;
+	}
+	_head = NULL;
+	_tail = NULL;
+}
+
+int PersonList::GetCount()
+{
+    return _count;
+}
+
+void PersonList::MenuList()
+{
+    cout << endl << "---Меню---" << endl
+        << "1. Добавить человека в конец первого списка." << endl
+        << "2. Скопировать второго человека из первого списка во второй." << endl
+        << "3. Удалить второго человека из первого списка." << endl
+        << "4. Очистить первый список." << endl
+        << "5. Ввод-вывод человека." << endl
+        << "ESC - выйти из программы." << endl
+        << "Выберите номер функции (1-5), либо нажмите ESC для выхода из программы" << endl;
+}
+
+Person* PersonList::GetRandomPerson()
+{
+    char* surnames[] = { "Holiday","Jacobson","James", "Allford", "Bawerman",
+        "MacAdam", "Marlow", "Bosworth", "Neal","Conors",
+        "Daniels", "Parson", "Quincy", "Richards", "Fane" };
+    char* names[] = { "Michael","Joshua","Matthew","Ethan","Andrew",
+        "Alexander", "Tyler", "James", "John","Samuel",
+        "Christian","Logan","Jose","Justin","Gabriel" };
+    int surname = rand() % 15;
+    int name = rand() % 15;
+    int age = 14 + rand() % 80;
+    Person* person = new Person();
+    person->SetName(names[name]);
+    person->SetSurname(surnames[surname]);
+    person->SetAge(age);
+    person->SetSex(Male);
+
+    return person;
+}
+
+void PersonList::Menu()
+{
+    PersonList list1;
+    list1.Add(PersonList::GetRandomPerson());
+    list1.Add(PersonList::GetRandomPerson());
+    list1.Add(PersonList::GetRandomPerson());
+
+    PersonList list2;
+    list2.Add(PersonList::GetRandomPerson());
+    list2.Add(PersonList::GetRandomPerson());
+    list2.Add(PersonList::GetRandomPerson());
+
+    ChangeFont(Green);
+    cout << "Лист 1: " << endl;
+    ChangeFont(Blue);
+    list1.ShowList();
+    ChangeFont(Green);
+    cout << "Лист 2: " << endl;
+    ChangeFont(Blue);
+    list2.ShowList();
+    ChangeFont(Green);
+    cout << "Открыть меню - М" << endl;
+    char Number = '0';
+    while (Number != 27)
+    {
+        Number = _getch();
+
+        switch (Number)
+        {
+        case '1':
+        {
+            system("cls");
+            ChangeFont(Green);
+            list1.Add(PersonList::ReadPerson());
+            cout << "Лист 1: " << endl;
+            ChangeFont(Blue);
+            list1.ShowList();
+            ChangeFont(Green);
+            cout << "Лист 2: " << endl;
+            ChangeFont(Blue);
+            list2.ShowList();
+            ChangeFont(Green);
+            cout << "Человек добавлен в конец первого списка." << endl;
+            cout << "Открыть меню - М" << endl;
+            break;
+        }
+        case '2':
+        {
+            system("cls");
+            ChangeFont(Green);
+            list2.Add(list1.Find(1));
+            cout << "Лист 1: " << endl;
+            ChangeFont(Blue);
+            list1.ShowList();
+            ChangeFont(Green);
+            cout << "Лист 2: " << endl;
+            ChangeFont(Blue);
+            list2.ShowList();
+            ChangeFont(Green);
+            cout << "Второй человек из первого списка скопирован во второй." << endl;
+            cout << "Открыть меню - М" << endl;
+            break;
+        }
+        case '3':
+        {
+            system("cls");
+            list1.RemoveAt(1);
+            ChangeFont(Green);
+            cout << "Лист 1: " << endl;
+            ChangeFont(Blue);
+            list1.ShowList();
+            ChangeFont(Green);
+            cout << "Лист 2: " << endl;
+            ChangeFont(Blue);
+            list2.ShowList();
+            ChangeFont(Green);
+            cout << "Второй человек из первого списка удалён." << endl;
+            cout << "Открыть меню - М" << endl;
+            break;
+        }
+        case '4':
+        {
+            system("cls");
+            list1.Clear();
+            ChangeFont(Green);
+            cout << "Лист 1: " << endl;
+            ChangeFont(Blue);
+            list1.ShowList();
+            ChangeFont(Green);
+            cout << "Лист 2: " << endl;
+            ChangeFont(Blue);
+            list2.ShowList();
+            ChangeFont(Green);
+            cout << "Первый список очищен." << endl;
+            cout << "Открыть меню - М" << endl;
+            break;
+        }
+        case '5':
+        {
+            system("cls");
+            ChangeFont(Blue);
+            PersonList::ShowPerson(PersonList::ReadPerson());
+            ChangeFont(Green);
+            cout << "Открыть меню - М" << endl;
+            break;
+        }
+        case 'M':
+        case 'm':
+        case 'V':
+        case 'v':
+        case 'Ь':
+        case 'ь':
+        case 'М':
+        case 'м':
+        {
+            system("cls");
+            ChangeFont(Magenta);
+            PersonList::MenuList();
+            break;
+        }
+        }
+    }
+}
+
+
