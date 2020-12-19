@@ -1,0 +1,457 @@
+#include "Header.h"
+#include <iostream>
+#include <stdio.h>
+#include <Windows.h>
+#include "stdafx.h"
+using namespace std;
+
+int main()
+{
+	setlocale(LC_ALL, "Russian");
+	setlocale(LC_CTYPE, "rus");
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+	int key = 0;
+	while (key != 5)
+	{
+		cout << "------Лабораторная работа №7-----" << endl;
+		cout << "1. Демонстрация на примере double " << endl;
+		cout << "2. Демонстрация на примере Person* " << endl;
+		cout << "3. Демонстрация на примере double[5]" << endl;
+		cout << "4. Демонстрация на примере List<double>" << endl;
+		cout << "5. Выход" << endl;
+		cout << "------Выберите действие (1-5)-----" << endl;
+		cin >> key;
+		switch (key)
+		{
+		case 1:
+		{
+			ListLab7<double> list;
+			cout << "Демонстрация на примере double " << endl;
+			cout << "Добавление в список " << endl;
+			list.Add(0.1);
+			list.Add(1.1);
+			list.Add(2.2);
+			list.Add(3.3);
+			list.Add(4.4);
+			list.RunningPiaceOfSoftware();
+			list.InsertByIndex(666.222, 3);
+			list.Show();
+		}
+		break;
+		case 2:
+		{
+			ListLab7<Person*> list;
+			cout << "Демонстрация на примере Person* " << endl;
+			cout << "Добавление в список" << endl;
+			Person person[6];
+			for (int i = 0; i < 5; i++)
+			{
+				strcpy_s(person[i].Surname, "Иванов");
+				strcpy_s(person[i].Name, "Иван");
+				list.Add(&person[i]);
+			}
+			Person newPerson;
+			strcpy_s(newPerson.Surname, "Пупкин");
+			strcpy_s(newPerson.Name, "Вася");
+			list.RunningPiaceOfSoftware();
+			list.InsertByIndex(&newPerson, 3);
+			list.Show();
+		}
+		break;
+		case 3:
+		{
+			ListLab7<double*> list;
+			cout << "Демонстрация на примере double[5] " << endl;
+			double array1[] = { 0.1, 0.2, 0.3, 0.4, 0.5 };
+			double array2[] = { 1.1, 1.2, 1.3, 1.4, 1.5 };
+			double array3[] = { 2.1, 2.2, 2.3, 2.4, 2.5 };
+			double array4[] = { 3.1, 3.2, 3.3, 3.4, 3.5 };
+			double array5[] = { 4.1, 4.2, 4.3, 4.4, 4.5 };
+			double array6[] = { 666.666, 000.999, 333.444, 777.777, 555.888 };
+			cout << "Добавление в список" << endl;
+			list.Add(array1);
+			list.Add(array2);
+			list.Add(array3);
+			list.Add(array4);
+			list.Add(array5);
+			list.RunningPiaceOfSoftware();
+			list.InsertByIndex(array6, 3);
+			list.Show();
+		}
+		break;
+		case 4:
+		{
+			ListLab7<ListLab7<double>*> list;
+			cout << "Демонстрация на примере List<double>" << endl;
+			ListLab7<double> list1;
+			list1.Add(0.1);
+			list1.Add(0.2);
+			list1.Add(0.3);
+			list1.Add(0.4);
+			list1.Add(0.5);
+			ListLab7<double> list2;
+			list2.Add(1.1);
+			list2.Add(1.2);
+			list2.Add(1.3);
+			list2.Add(1.4);
+			list2.Add(1.5);
+			ListLab7<double> list3;
+			list3.Add(2.1);
+			list3.Add(2.2);
+			list3.Add(2.3);
+			list3.Add(2.4);
+			list3.Add(2.5);
+			ListLab7<double> list4;
+			list4.Add(3.1);
+			list4.Add(3.2);
+			list4.Add(3.3);
+			list4.Add(3.4);
+			list4.Add(3.5);
+			ListLab7<double> list5;
+			list5.Add(4.1);
+			list5.Add(4.2);
+			list5.Add(4.3);
+			list5.Add(4.4);
+			list5.Add(4.5);
+			ListLab7<double> list6;
+			list6.Add(0.111);
+			list6.Add(222.444);
+			list6.Add(333.333);
+			list6.Add(666.777);
+			list6.Add(888.999);
+			cout << "Добавление в список " << endl;
+			list.Add(&list1);
+			list.Add(&list2);
+			list.Add(&list3);
+			list.Add(&list4);
+			list.Add(&list5);
+			list.RunningPiaceOfSoftware();
+			list.InsertByIndex(&list6, 3);
+			list.Show();
+		}
+		break;
+		}
+	}
+	return 0;
+}
+
+ostream & operator<<(ostream & ostream, double* arrayDouble)
+{
+	for (int i = 0; i < 5; i++)
+	{
+		ostream << arrayDouble[i] << " ";
+	}
+	return ostream;
+};
+
+
+#pragma once
+#include "stdafx.h"
+class Person
+{
+public:	
+	char Surname[20];
+	char Name[20];
+};
+
+template <typename T>
+class ListLab7
+{
+private:
+	template <typename NodeT>
+	class ListItem
+	{
+	public:
+		ListItem()
+		{
+		};
+
+		ListItem(NodeT value)
+		{
+			SetValue(value);
+		}
+		void SetValue(NodeT value)
+		{
+			_value = value;
+		}
+		NodeT GetValue()
+		{
+			return _value;
+		}
+
+		ListItem<NodeT>* next = NULL;
+		ListItem<NodeT>* prev = NULL;
+	private:
+		NodeT _value;
+
+	};
+	ListItem<T>* _head = NULL;
+	ListItem<T>* _tail = NULL;
+	int _count = 0;
+
+public:
+	ListLab7()
+	{
+		CreateTemplate();
+	};
+	~ListLab7()
+	{
+		Clear();
+	};
+	// Добавить в список
+	void Add(T element)
+	{
+		ListItem<T>* temp = new ListItem<T>(element);
+		if (_tail)
+		{
+			temp->prev = _tail;
+			_tail->next = temp;
+		}
+		else
+		{
+			_head = temp;
+		}
+		_tail = temp;
+		_count++;
+	};
+
+	// Найти по индексу
+	T Find(int index)
+	{
+		if (index < 0)
+		{
+			return NULL;
+		}
+		ListItem<T>* current = _head;
+		for (int i = 0; i < index; i++)
+		{
+			if (current->next)
+			{
+				current = current->next;
+			}
+		}
+		return current->GetValue();
+	};
+
+	// Вернуть индекс человека, если он есть в списке
+	int IndexOf(T element)
+	{
+		ListItem<T>* current = _head;
+		int count = 0;
+		while (current)
+		{
+			if (current->GetValue() == element)
+			{
+				return count;
+			}
+			current = current->next;
+			count++;
+		}
+		return -1;
+	};
+
+	// Удалить из списка
+	void Remove(T element)
+	{
+		ListItem<T>* temp = _head;
+		if (temp)
+		{
+			while (temp->GetValue() != element)
+			{
+				if (!(temp->next))
+				{
+					return;
+				}
+				temp = temp->next;
+			}
+		}
+		else
+		{
+			return;
+		}
+
+		if (temp->next)
+		{
+			temp->next->prev = temp->prev;
+		}
+		else
+		{
+			_tail = temp->prev;
+		}
+		if (temp->prev)
+		{
+			temp->prev->next = temp->next;
+		}
+		else
+		{
+			_head = temp->next;
+		}
+		delete temp;
+	}
+
+	// Удалить из списка по индексу
+	void RemoveAt(int index)
+	{
+		ListItem<T>* temp = _head;
+		int count = 0;
+		if (index < 0)
+		{
+			return;
+		}
+
+		while (temp)
+		{
+			if (count == index)
+			{
+				break;
+			}
+			count++;
+			temp = temp->next;
+		}
+		if (temp->next)
+		{
+			temp->next->prev = temp->prev;
+		}
+		else
+		{
+			_tail = temp->prev;
+		}
+		if (temp->prev)
+		{
+			temp->prev->next = temp->next;
+		}
+		else
+		{
+			_head = temp->next;
+		}
+		delete temp;
+	};
+
+	void InsertByIndex(T element, int index)
+	{
+		if (!(_head) || index < 0)
+		{
+			return;
+		}
+
+		ListItem<T>* temp = _head;
+		int i = 0;
+
+		while (i < index)
+		{
+			temp = temp->next;
+			i++;
+			if (!(temp))
+			{
+				Add(element);
+				return;
+			}
+		};
+
+		if (temp == _head)
+		{
+			ListItem<T>* newNode = new ListItem<T>(element);
+			_head->prev = newNode;
+			newNode->next = _head;
+
+			_head = newNode;
+			return;
+		}
+
+		if (temp == _tail)
+		{
+			ListItem<T>* newNode = new ListItem<T>(element);
+			_tail->prev->next = newNode;
+			newNode->prev = _tail->prev;
+			newNode->next = _tail;
+			_tail->prev = newNode;
+			_tail->next = NULL;
+			return;
+		}
+
+
+		if (temp)
+		{
+			ListItem<T>* newNode = new ListItem<T>(element);
+			temp->prev->next = newNode;
+			newNode->prev = temp->prev;
+			newNode->next = temp;
+			temp->prev = newNode;
+		}
+		return;
+	};
+
+	// Очистить список
+	void Clear()
+	{
+		ListItem<T>* temp = _head;
+		while (temp)
+		{
+			_tail = temp->next;
+			delete temp;
+			temp = _tail;
+		}
+		_head = NULL;
+		_tail = NULL;
+		_count = 0;
+	};
+
+	// Количество элементов
+	int GetCount()
+	{
+		return _count;
+	}
+
+	void Show()
+	{
+		cout << "Вывод содержимого " << endl;
+		if (GetCount() == 0)
+		{
+			cout << "Список пуст" << endl;
+		}
+		else
+		{
+			ListItem<T>* temp = _head;
+			int count = 1;
+			while (temp)
+			{
+				cout << temp->GetValue() << endl;
+				temp = temp->next;
+			}
+		}
+		cout << endl;
+	};
+
+	void CreateTemplate()
+	{
+		_count = 0;
+		_head = NULL;
+		_tail = NULL;
+	};
+
+	void RunningPiaceOfSoftware()
+	{
+		Show();
+		cout << "Удаление третьего элемента: ";
+		cout << Find(2) << endl;
+		RemoveAt(2);
+
+		Show();
+
+		cout << "Добавление нового элемента под четвертым индексом " << endl;
+
+	};
+
+	friend ostream& operator<<(ostream& stream, ListLab7<T>* list)
+	{
+		ListItem<T>* temp = list->_head;
+		while (temp)
+		{
+			stream << temp->GetValue() << " ";
+			temp = temp->next;
+		}
+		return stream;
+	}
+
+};
