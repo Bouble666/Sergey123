@@ -1,0 +1,480 @@
+#include "Header.h"
+#include <iostream>
+#include <Windows.h>
+using namespace std;
+
+PersonList::PersonList()
+{
+}
+
+Person::Person()
+{
+}
+
+Adult::Adult()
+{
+}
+
+Child::Child()
+{
+}
+
+char* Person::GetName()
+{
+	return Name;
+}
+
+char* Person::GetSurname()
+{
+	return Surname;
+}
+
+char Person::GetSex()
+{
+	if (Sex == Person::Sex::f)
+		return 'f';
+	else if(Sex==Person::Sex::m)
+		return 'm';
+}
+
+char* Adult::GetWorkPlace()
+{
+	return WorkPlace;
+}
+
+void Person::SetName(char* name)
+{
+	Name = name;
+}
+
+void Person::SetSurname(char* surname)
+{
+	Surname = surname;
+}
+
+void Person::SetSex(char sex)
+{
+	if (sex == 'f')
+	{
+		Sex = Person::Sex::f;
+	}
+	else
+	{
+		Sex = Person::Sex::m;
+	}
+}
+
+void Adult::SetWorkPlace(char* workPlace)
+{
+	WorkPlace = workPlace;
+}
+
+void Adult::SetMarried(Person* person)
+{
+	MarriedOn = person;
+}
+
+void Child::SetMother(Person* person)
+{
+	Mother = person;
+}
+
+void Child::SetFather(Person* person)
+{
+	Father = person;
+}
+
+void Child::SetSchool(char* school)
+{
+	School = school;
+}
+
+void Adult::CreateAdult(char* name, char* surname, int age, char sex,  char* workplace)
+{	
+	SetName(name);
+	SetSurname(surname);
+	SetAge(age);
+	SetSex(sex);
+	SetWorkPlace(workplace);
+}
+
+void Child::CreateChild(char* name, char* surname, int age, char sex,  char* school)
+{
+	SetName(name);
+	SetSurname(surname);
+	SetAge(age);
+	SetSex(sex);
+	SetSchool(school);
+}
+
+int GetLength(char* string)
+{
+	int i = 0;
+	int length = 0;
+	while (string[i])
+	{
+		i++;
+		length++;
+	}
+	return length;
+}
+
+char* Concatenate(char* string1, char* string2)
+{
+	int length1 = GetLength(string1);
+	int length2 = GetLength(string2);
+	int j;
+	for (j = 0; j<length2; j++)
+	{
+		string1[length1 + j] = string2[j];
+	}
+	j = length1 + j;
+	string1[j] = '\0';
+	return string1;
+}
+
+
+char* Person::GetDescription()
+{
+	char* description = new char[200];
+	Concatenate(description, Name);
+	Concatenate(description, " ");
+	Concatenate(description, Surname);
+	Concatenate(description, ", ");
+	char ageChar[2];
+	_itoa_s(_age, ageChar, 10, 10);
+	Concatenate(description, ageChar);
+	Concatenate(description, " years old, ");
+	if (GetSex() == 'f')
+		Concatenate(description, "female,");
+	else if (GetSex()=='m')
+		Concatenate(description, "male,");
+	return description;
+}
+
+char* Adult::GetDescription()
+{
+	char* description = new char[255];
+	description[0] = '\0';
+	Concatenate(description, Name);
+	Concatenate(description, " ");
+	Concatenate(description, Surname);
+	Concatenate(description, ", ");
+	char* ageChar = new char[10];
+	_itoa_s(GetAge(), ageChar, 10, 10);
+	Concatenate(description, ageChar);
+	Concatenate(description, " years old , ");
+	if (GetSex() == 'f')
+	{
+		Concatenate(description, "female, ");
+	}
+	else
+	{
+		Concatenate(description, "male, ");
+	}
+	if (MarriedOn)
+	{
+		Concatenate(description, "married on ");
+		Concatenate(description, MarriedOn->GetName());
+		Concatenate(description, " ");
+		Concatenate(description, MarriedOn->GetSurname());
+		Concatenate(description, ", ");
+	}
+	else
+	{
+		Concatenate(description, "single, ");
+	}
+	if (WorkPlace)
+	{
+		Concatenate(description, GetWorkPlace());
+	}
+	else
+	{
+		Concatenate(description, "no job");
+	}
+	return description;
+}
+
+char* Child::GetDescription()
+{
+	char* description = new char[255];
+	description[0] = '\0';
+	Concatenate(description, Name);
+	Concatenate(description, " ");
+	Concatenate(description, Surname);
+	Concatenate(description, ", ");
+	char* ageChar = new char[10];
+	_itoa_s(GetAge(), ageChar, 10, 10);
+	Concatenate(description, ageChar);
+	Concatenate(description, " years old , ");
+	if (GetSex() == 'F')
+	{
+		Concatenate(description, "female, ");
+	}
+	else
+	{
+		Concatenate(description, "male, ");
+	}
+	if (School)
+	{
+		Concatenate(description, School);
+		Concatenate(description, ", ");
+	}
+	else
+	{
+		Concatenate(description, "does not go to school, ");
+	}
+	if (Mother && Father)
+	{
+		Concatenate(description, "parents are ");
+		Concatenate(description, Mother->GetName());
+		Concatenate(description, " ");
+		Concatenate(description, Mother->GetSurname());
+		Concatenate(description, " and ");
+		Concatenate(description, Father->GetName());
+		Concatenate(description, " ");
+		Concatenate(description, Father->GetSurname());
+	}
+	else if (Mother && (!(Father)))
+	{
+		Concatenate(description, "mother is ");
+		Concatenate(description, Mother->GetName());
+		Concatenate(description, " ");
+		Concatenate(description, Mother->GetSurname());
+	}
+	else if (Father && (!(Mother)))
+	{
+		Concatenate(description, "father is ");
+		Concatenate(description, Father->GetName());
+		Concatenate(description, " ");
+		Concatenate(description, Father->GetSurname());
+	}
+	else
+	{
+		Concatenate(description, "parents are not specifield.");
+	}
+	return description;
+}
+
+void PersonList::PrintPerson(Person* person)
+{
+	cout << person->GetDescription() << endl;
+}
+
+void PersonList::Show()
+{
+	PersonListItem* showItem=_head;
+	if (showItem)
+	{
+		while (showItem != NULL)
+		{
+			PrintPerson(showItem->Person);
+			showItem = showItem->NextItem;
+		}
+	}
+	else cout << "Список пуст";
+	cout << endl;
+}
+
+Person* PersonList::Find(int index)
+{
+	PersonListItem* temp = _head;
+	if (index > _count)
+		return NULL;
+
+	for (int i = 0; i < index; i++)
+		temp = temp->NextItem;
+	
+	return temp->Person;
+}
+
+void PersonList::Add(Adult* person)
+{
+	PersonListItem* personListItem = new PersonListItem;
+	personListItem->Person = person;
+	if (_head == NULL)
+	{
+		_head = personListItem;
+		_head->NextItem = NULL;
+	}
+	else
+	{
+		PersonListItem* temp = _head;
+		while (temp->NextItem != NULL)
+			temp = temp->NextItem;
+		temp->NextItem = personListItem;
+		personListItem->NextItem = NULL;
+	}
+	_count++;
+}
+
+void PersonList::Add(Child* person)
+{
+	PersonListItem* personListItem = new PersonListItem;
+	personListItem->Person = person;
+	if (_head == NULL)
+	{
+		_head = personListItem;
+		_head->NextItem = NULL;
+	}
+	else
+	{
+		PersonListItem* temp = _head;
+		while (temp->NextItem != NULL)
+			temp = temp->NextItem;
+		temp->NextItem = personListItem;
+		personListItem->NextItem = NULL;
+	}
+	_count++;
+}
+
+int main()
+{
+	setlocale(LC_ALL, "Russian");
+	setlocale(LC_CTYPE, "rus");
+	SetConsoleCP(1251);
+	SetConsoleOutputCP(1251);
+	PersonList list;
+	Adult person1;
+	person1.CreateAdult("John", "Carlale", 35, 'm', "Microsoft");
+	Adult person2;
+	person2.CreateAdult("Jahnet", "Ogaiyo", 34, 'f', "Hospital №5");
+	Child person3;
+	person3.CreateChild("Bill", "Carlale", 12, 'm', "School №1");
+	Adult person4;
+	person4.CreateAdult("John", "Smith", 40, 'm', "Beerfactory");
+	Adult person5;
+	person5.CreateAdult("Alice", "Williams", 39, 'f', NULL);
+	Child person6;
+	person6.CreateChild("Vasya", "Pupkin", 16, 'm', NULL);
+	Adult person7;
+	person7.CreateAdult("Fill", "Richards", 27, 'm', "Hospital №9");
+	person1.SetMarried(&person2);
+	person2.SetMarried(&person1);
+	person3.SetFather(&person1);
+	person3.SetMother(&person2);
+	person4.SetMarried(&person5);
+	person5.SetMarried(&person4);
+	list.Add(&person1);
+	list.Add(&person2);
+	list.Add(&person3);
+	list.Add(&person4);
+	list.Add(&person5);
+	list.Add(&person6);
+	list.Add(&person7);
+	int key = 0;
+	while (key != 3)
+	{
+		cout << "---Лабораторная работа №6---" << endl;
+		cout << "1. Показать всех людей из списка" << endl;
+		cout << "2. Найти человека по индексу" << endl;
+		cout << "3. Выход" << endl;
+		cout << "---Выберите действие (1-3):" << endl;
+		cin >> key;
+		switch (key)
+		{
+		case 1:
+		{
+			list.Show();
+		}
+		break;
+		case 2:
+		{
+			cout << "Введите индекс: " << endl;
+			int index;
+			cin >> index;			
+			list.PrintPerson(list.Find(index));
+		}
+		break;
+		}
+	}
+	return 0;
+}
+
+
+class Person
+{
+public:
+	enum class Sex
+	{
+		m,
+		f
+	};
+	Person();
+	virtual char* GetDescription();
+	int GetAge()
+	{
+		return _age;
+	}
+	virtual void SetAge(int age)
+	{
+		if (age > 0)
+		{
+			_age = age;
+		}
+		else
+		{
+			_age = 1;
+		}
+	}
+	void SetName(char* name);
+	void SetSurname(char* surname);
+	void SetSex(char sex);
+	char GetSex();
+	char* GetName();
+	char* GetSurname();
+protected: 
+	int _age;
+	char* Name=new char[20];
+	char* Surname=new char[20];
+	Sex Sex;
+};
+
+class Adult : public Person
+{
+private:
+	Person* MarriedOn;
+	char* WorkPlace=new char[100];
+public:
+	Adult();
+	void CreateAdult(char* name, char* surname, int age, char sex,  char* workPlace);
+	void SetMarried(Person* person);
+	char* GetDescription() override;
+	void SetWorkPlace(char* workPlace);
+	char* GetWorkPlace();
+};
+
+class Child : public Person
+{
+private:
+	Person* Mother;
+	Person* Father;
+	char* School=new char[100];
+public:	
+	Child();
+	char* GetDescription() override;
+	void SetSchool(char* school);
+	void SetMother(Person* person);
+	void SetFather(Person* person);
+	void CreateChild(char* name, char* surname, int age, char sex,  char* school);
+};
+
+class PersonList
+{
+private:
+	class PersonListItem
+	{
+	public:
+		Person* Person;
+		PersonListItem* NextItem;
+	};
+	PersonListItem* _head;
+	int _count = 0;
+public:
+	PersonList();
+	void Add(Adult* person);
+	void Add(Child* person);
+	void PrintPerson(Person* person);
+	void Show();
+	Person* Find(int index);
+};
