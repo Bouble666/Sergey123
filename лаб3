@@ -1,0 +1,452 @@
+#include "stdafx.h"
+#include <Windows.h>
+#include "StringFunc.h"
+
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    ChoiceFunction();
+    return 0;
+    
+    
+    #include "stdafx.h"
+#include "Person.h"
+
+Person ReadPerson()
+{
+    Person Person;
+    cout << "Введите фамилию: ";
+    cin >> Person.Surname;
+    cout << "Введите имя: ";
+    cin >> Person.Name;
+    cout << "Выберите пол: \n1. Мужской\n2. Женский" << endl;
+    char sex = 0;
+    while (Person.Sex != Male && Person.Sex != Female)
+    {
+        sex = _getch();
+        switch (sex)
+        {            
+            case MALE:
+            {
+                Person.Sex = (Sex)100;
+                break;
+            }
+
+            case FEMALE:
+            {
+                Person.Sex = Female;
+                break;
+            }
+
+            default:
+                break;
+        }
+        if (Person.Sex == Male || Person.Sex == Female)
+            break;
+        else
+            cout << "Пожалуйста, введите цифру 1 или 2 в завимости от вашего пола: " << endl;
+    }
+    return Person;
+}
+
+void PrintPerson(Person person)
+{
+    cout << endl << "Фамилия: " << person.Surname << endl;
+    cout << "Имя: " << person.Name << endl;
+    if ((&person)->Sex == Male)
+        cout << "Пол: " <<  "Мужской" << endl;
+    else if (person.Sex == 2)
+        cout << "Пол: " <<"Женский" << endl;
+}
+
+
+
+#include "stdafx.h"
+#include "StringFunc.h"
+#include "Person.h"
+
+int GetLength(char* string)
+{
+    int length = 0;
+    while (string[length] != '\0')
+        length++;
+    return length;
+}
+
+char* Concatenate(char* string1, char* string2)
+{
+    int length1 = GetLength(string1);
+    int length2 = GetLength(string2);
+    int length3 = GetLength(string1) + GetLength(string2);
+    char* newString = new char[length3 + 1];
+    
+    int j = 0;
+
+    for (int i = 0; i < length3; i++)
+    {
+        if (i < length1)
+            newString[i] = string1[i];
+        else
+            newString[i] = string2[j++];
+    }
+    newString[length3] = '\0';
+    return newString;
+}
+
+char* GetSubstring(char* string, int startIndex, int charCount)
+{
+    if ((startIndex < 0) || (charCount < 0) || (startIndex + charCount > GetLength(string)))
+        return "NULL";
+    char* newString = new char[charCount];
+    int j = 0;
+    for (int i = startIndex; i < startIndex + charCount; i++)
+    {
+        newString[j] = string[i];
+        j++;
+    }
+    newString[charCount] = '\0';
+    return newString;
+}
+
+int FindSubstring(char* string, char* substring)
+{
+    for (int i = 0; i < GetLength(string); i++)
+    {
+        if (string[i] == substring[0])
+        {
+            bool subString = true;
+            int str = i;
+            for (int subStr = 0; subStr < GetLength(substring); subStr++)
+            {
+                if (str > GetLength(string))
+                    return -1;
+                if (string[str] != substring[subStr])
+                    subString = false;
+                str++;
+            }
+            if (subString == true)
+                return i;
+        }
+    }
+    return -1;
+}
+
+char* Uppercase(char* string)
+{
+    int length = GetLength(string);
+    char* newString = new char[length];
+    int i = 0;
+        
+    newString[i] = '\0';
+
+    for (int i = 0; i < length; i++)
+    {
+		if (string[i] >= 'a' && string[i] <= 'z')
+			newString[i] = string[i] - 32;
+    }
+    return newString;
+}
+
+char* Lowercase(char* string)
+{
+    int length = GetLength(string);
+    char* newString = new char[length];
+    for (int i = 0; i < length; i++)
+    {
+        newString[i] = string[i];
+        newString[i + 1] = '\0';
+    }
+
+    for (int i = 0; i < length; i++)
+    {
+        if (newString[i] >= 'A' && newString[i] <= 'Z')
+            newString[i] += 32;
+    }
+    return newString;
+}
+
+int Copy(char* string, char* resString, int i, int j)
+{
+    while (string[i] != '\0')
+        resString[j++] = string[i++];
+    resString[j] = '\0';
+    return i;
+}
+
+void SplitFilename(char* source, char* path, char* name, char* extension)
+{
+    int index = 0;
+    int pointPlace;
+    int subIndex = 0;
+    bool exit = false;
+    while (source[index] != '\0')
+    {
+        if (source[index] == '.')
+            break;
+        index++;
+    }
+    if ((source[index - 1] != '\0') && (index != 0))
+    {
+        pointPlace = index;
+        index = Copy(source, extension, index, subIndex);
+
+        while ((source[index] != '\\') && (index != 0))
+            index--;
+        if (index != pointPlace - 1)
+        {
+            if (index != 0)
+            {
+                for (subIndex = 0; subIndex < index + 1; subIndex++)//использовать функцию
+                    path[subIndex] = source[subIndex];
+                path[subIndex] = '\0';
+
+                for (index = 0; subIndex < pointPlace;)
+                    name[index++] = source[subIndex++];
+                name[index] = '\0';
+            }
+            else
+            {
+                for (index = 0; index < pointPlace; index++)
+                    name[index] = source[index];
+                name[index] = '\0';
+                path[0] = '\0';
+            }
+        }
+        else
+            exit = true;
+    }
+    else
+        exit = true;
+
+    if (exit == true)
+    {
+        path[0] = '\0';
+        extension[0] = '\0';
+        name[0] = '\0';
+    }
+    cout << "source: " << source << endl;
+    cout << "path: " << path << endl;
+    cout << "name: " << name << endl;
+    cout << "extension: " << extension << endl << endl;
+}
+
+char* ReplaceTabsOnSpaces(char* string, int countSpace)
+{
+    int length = GetLength(string);
+    char* newString = new char[length];
+    int endSymbol = 0;
+    int currentSymbolNewString = 0;
+    for (int i = 0; i < length; i++)
+    {
+        if (string[i] == '\t')
+            for (int i = 0; i < countSpace; i++)
+            {
+                newString[currentSymbolNewString] = ':';
+            }
+        else
+        {
+            newString[currentSymbolNewString] = string[i];
+        }
+		endSymbol++;
+		currentSymbolNewString++;
+    }
+    newString[endSymbol] = '\0';
+    return newString;
+}
+
+char* ReplaceSpacesOnTabs(char* string, int countSpace)
+{
+    int length = GetLength(string);
+    char* newString = new char[length];
+    int endSymbol = 0;
+    int testSymbolNewString = 0;
+    int currentSymbolNewString = 0;
+    for (int i = 0; i < length; i++)
+    {
+        testSymbolNewString = i;
+        bool isTab = true;
+        for (int i = 0; i < countSpace; i++)
+            if (string[testSymbolNewString++] != ':')
+                isTab = false;
+        if (isTab == true)
+        {
+            newString[i] = '\t';
+            i += 3;
+        }
+        else
+            newString[currentSymbolNewString] = string[i];
+        endSymbol++;
+        currentSymbolNewString++;
+    }
+    newString[endSymbol] = '\0';
+    return newString;
+}
+
+void List()
+{
+    cout << endl << "---Программное меню---" << endl
+        << "1. GetLengthItem()" << endl
+        << "2. ConcatenateItem()" << endl
+        << "3. GetSubstringItem()" << endl
+        << "4. FindSubstringItem()" << endl
+        << "5. ConvertUppercase()" << endl
+        << "6. ConvertLowercase()" << endl
+        << "7. SplitFilenameItem()" << endl
+        << "8. ReplaceTabsOnSpacesItem()" << endl
+        << "9. ReplaceSpacesOnTabsItem()" << endl
+        << "Esc. Выход из программы и переход к демонстрации структуры Person" << endl
+        << "---Выберите номер функции для тестирования (1-9): ";
+}
+
+void ChoiceFunction()
+{
+    char Number = '0';
+
+    while (Number != 27)
+    {
+        List();
+        cout << endl;
+        Number = _getch();
+
+        switch (Number)
+        {
+            case GetLengthItem:
+            {
+                char str1[20] = "";
+                cout << "Введите строку: ";
+                cin.getline(str1, 20);
+                cout << "В строке: " << str1 << " - " << GetLength(str1) << " символов." << endl << endl;
+				system("pause");
+                break;
+            }
+
+            case ConcateItem:
+            {
+                char str21[20] = "";
+                char str22[20] = "";
+                cout << "Введите входные строки!" << endl;
+                cin.getline(str21, 20);
+                cin.getline(str22, 20);
+                cout << "Новая строка из объединения 2-х входных: " << Concatenate(str21, str22) << endl << endl;
+				system("pause");
+                break;
+            }
+
+            case GetSubstringItem:
+            {
+                char str3[] = "Hello, World!";
+                cout << GetSubstring(str3, 2, 4) << endl;
+                cout << GetSubstring(str3, -3, 3) << endl;
+                cout << GetSubstring(str3, 2, -4) << endl;
+                cout << GetSubstring(str3, 7, 8) << endl;
+				system("pause");
+                break;
+            }
+
+            case FindSubstringItem:
+            {
+                char str41[] = "Lorem ipsum aset amet";
+                char str42[] = "Lorem ipsum aset ametsum";
+                char substr41[] = "ipsum a";
+                char substr42[] = "Arom";
+                char substr43[] = "sum";
+                cout << "Функция возвращает индекс начала подстроки в строке, либо возвращает -1, если таковой нет." << endl << endl
+                     << "Строка 1: " << str41 << endl;
+                cout << "Индекс подстроки \"" << substr41 << "\" = "
+                     << FindSubstring(str41, substr41) << endl;
+                cout << "Индекс подстроки \"" << substr42 << "\" = "
+                     << FindSubstring(str41, substr42) << endl << endl;
+                cout << "Строка 2: " << str42 << endl;
+                cout << "Индекс подстроки \"" << substr43 << "\" = "
+                     << FindSubstring(str42, substr43) << endl << endl;
+				system("pause");
+                break;
+            }
+
+            case UpperCaseItem:
+            {
+                char str5[] = "Different cases in That string, also 1 and 2 numbers!";
+                cout << "Исходная строка: " << str5 << endl;
+                cout << "Строка в верхнем регистре: " << Uppercase(str5) << endl << endl;
+				system("pause");
+                break;
+            }
+
+            case LowerCaseItem:
+            {
+                char str6[] = "Different cases in That string, also 1 and 2 numbers!";
+                cout << "Исходная строка: " << str6 << endl;
+                cout << "Строка в нижнем регистре: " << Lowercase(str6) << endl << endl;
+				system("pause");
+                break;
+            }
+
+            case SplitFileNameItem:
+            {
+                char source61[] = "d:\\folder\\file.exe";
+                char source62[] = "d:\\folder\\subfolder\\file.exe";
+                char source63[] = "d:\\folder\\subfolder\\file";
+                char source64[] = "file.txt";
+                char source65[] = "d:\\folder\\.exe";
+                char path[30] = "";
+                char name[20] = "";
+                char extension[10] = "";
+                SplitFilename(source61, path, name, extension);
+                SplitFilename(source62, path, name, extension);
+                SplitFilename(source63, path, name, extension);
+                SplitFilename(source64, path, name, extension);
+                SplitFilename(source65, path, name, extension);
+				system("pause");
+                break;
+            }
+
+            case ReplaceTabSOnTabsItem:
+            {
+                char str71[] = "Cake\tis\ta lie!";
+                char str72[] = "Cake\t\tis a lie!";
+                char str73[] = "\tCake is \tlie!";
+                cout << "Исходные строки: " << endl
+                     << str71 << endl
+                     << str72 << endl
+                     << str73 << endl << endl;
+                cout << ReplaceTabsOnSpaces(str71, 4) << endl
+                     << ReplaceTabsOnSpaces(str72, 4) << endl
+                     << ReplaceTabsOnSpaces(str73, 4) << endl << endl;
+				system("pause");
+                break;
+            }
+
+            case ReplaceSpaceOnTabsItem:
+            {
+                char str81[] = "Cake::::is::a:lie!";
+                char str82[] = "Cake::::is::::a:lie!";
+                char str83[] = "Cake:is:a:::::::lie!";
+                char str84[] = "Cake:is::a:lie!";
+                cout << "Исходные строки: " << endl
+                     << str81 << endl
+                     << str82 << endl
+                     << str83 << endl
+                     << str84 << endl << endl;
+                cout << ReplaceSpacesOnTabs(str81, 4) << endl
+                     << ReplaceSpacesOnTabs(str82, 4) << endl
+                     << ReplaceSpacesOnTabs(str83, 4) << endl
+                     << ReplaceSpacesOnTabs(str84, 4) << endl << endl;
+				system("pause");
+                 break;
+
+            }
+
+            case Exit:
+                break;
+
+            default:
+                break;
+        }
+    }
+    Person person = ReadPerson();
+    PrintPerson(person);
+    system("pause");
+}
