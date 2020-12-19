@@ -1,0 +1,354 @@
+#include "stdafx.h"
+#include <iostream>
+#include "DListFunction.h"
+
+
+int main()
+{
+    setlocale(LC_ALL, "rus");
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+    ChoiceFunction();
+
+    return 0;
+}
+
+
+#include "stdafx.h"
+#include "DListFunction.h"
+HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+void ChangeFont(ConsoleColor color)
+{
+    SetConsoleTextAttribute(hConsole, (WORD)((Black << 4) | (color)));
+}
+
+Person ReadPerson()
+{
+    Person Person;
+    cout << "Фамилия: ";
+    cin >> Person.Surname;
+    cout << "Имя: ";
+    cin >> Person.Name;
+    cout << "Выберете пол, нажав цифру 1 или 2: \n1. Мужской\n2. Женский" << endl;
+    char sex = 0;
+    while (Person.Sex != Male && Person.Sex != Female)
+    {
+        sex = _getch();
+        switch (sex)
+        {
+        case '1':
+        {
+            Person.Sex = Male;
+            break;
+        }
+
+        case '2':
+        {
+            Person.Sex = Female;
+            break;
+        }
+
+        default:
+            break;
+        }
+        if (Person.Sex == Male || Person.Sex == Female)
+            break;
+		else
+		{
+			cout << "Пожалуйста, введите цифру 1 или 2 в завимости от пола: " << endl;
+			cout << "Транссексуалов в рассчёт не берём. :^) " << endl;
+		}
+    }
+    return Person;
+}
+
+DList Add(DList list, Person& person)
+{
+    PersonItem* temp = new PersonItem();
+    temp->Data = person;
+
+    if (list.Head != NULL)
+    {
+        temp->Prev = list.Tail;
+        list.Tail->Next = temp;
+        list.Tail = temp;
+    }
+    else
+        list.Head = list.Tail = temp;
+
+    return list;
+}
+
+void PrintPerson(PersonItem personItem)
+{
+    cout << "Фамилия: " << personItem.Data.Surname << endl;
+    cout << "Имя: " << personItem.Data.Name << endl;
+    if (personItem.Data.Sex == 1)
+        cout << "Пол: " << "Мужской" << endl << endl;
+    else
+        cout << "Пол: " << "Женский" << endl << endl;
+}
+
+void Show(DList list)
+{
+    ChangeFont(Blue);
+    cout << endl;
+    PersonItem* temp = list.Head;
+    int i = 0;
+    if (list.Head != NULL)
+    {
+        cout << "------------------------------------------------------------" << endl;
+        while (temp != NULL)
+        {
+            cout << endl << "Человек №" << i++ << ":" << endl;
+            PrintPerson(*temp);
+            temp = temp->Next;
+        }
+        cout << "------------------------------------------------------------" << endl;
+    }
+    else
+        cout << "Список пуст!" << endl;
+}
+
+PersonItem* Get(DList list, int index)
+{
+    if (index < 0)
+        return NULL;
+
+    int i = 0;
+    PersonItem* temp = list.Head;
+    while (i < index)
+    {
+        if (temp == NULL)
+            return NULL;
+
+        temp = temp->Next;
+        i++;
+    };
+
+    return temp;
+}
+
+DList Remove(DList list, int index)
+{
+    Person* person = &Get(list, index)->Data;
+    PersonItem* temp = list.Head;
+
+    while (temp != NULL)
+    {
+        if (&temp->Data == person)
+        {
+            if (list.Head == temp)
+            {
+                if (temp->Next == NULL)
+                {
+                    list.Head = NULL;
+                    list.Tail = NULL;
+                    return list;
+                }
+                list.Head->Next->Prev = NULL;
+                list.Head = list.Head->Next;
+                return list;
+            }
+            if (list.Tail == temp)
+            {
+                list.Tail->Prev->Next = NULL;
+                list.Tail = list.Tail->Prev;
+                return list;
+            }
+            if (list.Head != temp && list.Tail != temp)
+            {
+                temp->Prev->Next = temp->Next;
+                temp->Next->Prev = temp->Prev;
+                return list;
+            }
+        }
+        temp = temp->Next;
+    }
+
+    delete person;
+    return list;
+}
+
+DList Insert(DList list, Person* person, int index)
+{
+    if (list.Head == NULL || index < 0)
+        return list;
+
+    PersonItem* temp = list.Head;
+    int i = 0;
+    while (i < index)
+    {
+        if (temp == NULL)
+            return list;
+        temp = temp->Next;
+        i++;
+    };
+
+    if (temp == list.Head)
+    {
+        PersonItem* newPerson = new PersonItem();
+        newPerson->Data = *person;
+
+        list.Head->Prev = newPerson;
+        newPerson->Next = list.Head;
+
+        list.Head = newPerson;
+        return list;
+    }
+
+    if (temp == list.Tail)
+    {
+        PersonItem* newPerson = new PersonItem();
+        newPerson->Data = *person;
+        list.Tail->Prev->Next = newPerson;
+        newPerson->Prev = list.Tail->Prev;
+        newPerson->Next = list.Tail;
+        list.Tail->Prev = newPerson;
+        list.Tail->Next = NULL;
+        return list;
+    }
+
+    if (temp != NULL)
+    {
+        PersonItem* newPerson = new PersonItem();
+        newPerson->Data = *person;
+        temp->Prev->Next = newPerson;
+        newPerson->Prev = temp->Prev;
+        newPerson->Next = temp;
+        temp->Prev = newPerson;
+    }
+
+    return list;
+}
+
+DList Clear(DList list)
+{
+    PersonItem* nextPersonItem = list.Head;
+    while (nextPersonItem != NULL)
+    {
+        PersonItem* tempNextPersonItem = nextPersonItem->Next;
+        delete nextPersonItem;
+        nextPersonItem = tempNextPersonItem;
+    }
+    list.Head = NULL;
+    list.Tail = NULL;
+    return list;
+}
+
+void MenuList()
+{
+    cout << endl << "---Меню---" << endl
+        << "1. Добавить человека в конец списка." << endl
+        << "2. Вывести список на экран." << endl
+        << "3. Вывести информацию о человеке." << endl
+        << "4. Удалить информацию о человеке." << endl
+        << "5. Добавить человека в любое место списка." << endl
+        << "6. Очистить список." << endl
+        << "ESC - выйти из программы." << endl
+        << "Выберите номер функции (1-6), либо нажмите ESC для выхода из программы" << endl;
+
+}
+
+void ChoiceFunction()
+{
+    DList list;
+    Person person;
+    char Number = '0';
+    int Index = 0;
+    ChangeFont(Blue);
+    Show(list);    
+    ChangeFont(Green);
+    MenuList();
+    while (Number != 27)
+    {
+        ChangeFont(Cyan);
+        Number = _getch();
+        system("cls");
+        switch (Number)
+        {
+            case '1':
+            {
+                cout << "Вы выбрали пункт №1.\nЧтобы занести человека в список, введите его данные ниже:" << endl;
+                person = ReadPerson();
+                list = Add(list, person);
+                cout << "Человек занесён в список.\nВыберите следующее действие!\n(Открыть меню - M)" << endl << endl;
+                break;
+            }
+            case '2':
+            {
+                cout << "Вы выбрали пункт №2." << endl;
+                Show(list);
+                ChangeFont(Green);
+                if (list.Head != NULL)
+                    cout << "Список выведен.\nВыберите следующее действие!\n(Открыть меню - M)" << endl << endl;
+                break;
+            }
+            case '3':
+            {
+                cout << "Вы выбрали пункт №3.\nЧтобы вывести информацию о нужном человеке, введите его индекс: ";
+                cin >> Index;
+                Person* person = &Get(list, Index)->Data;
+                if (person != NULL)
+                {
+                    ChangeFont(Blue);
+                    cout << "Фамилия: " << person->Surname << endl;
+                    cout << "Имя: " << person->Name << endl;
+                    if (person->Sex == 1)
+                        cout << "Пол: " << "Мужской" << endl;
+                    else
+                        cout << "Пол: " << "Женский" << endl;
+                }
+                ChangeFont(Green);
+                cout << endl << "Выберите следующее действие!\n(Открыть меню - M)" << endl << endl;
+                break;
+            }
+            case '4':
+            {
+                cout << "Вы выбрали пункт №4.\nЧтобы выбрать человека, которого вы хотите удалить из списка, введите его индекс: ";
+                cin >> Index;
+                list = Remove(list, Index);
+                cout << "Человек удалён из списка.\nВыберите следующее действие!\n(Открыть меню - M)" << endl << endl;
+                break;
+            }
+            case '5':
+            {
+                cout << "Вы выбрали пункт №5.\nЧтобы добавить человека в список определённое место, введите его даннные и индекс:" << endl;
+                person = ReadPerson();
+                cout << "Индекс: ";
+                cin >> Index;
+                list = Insert(list, &person, Index);
+                cout << "Человек добавлен на выбранное место\nВыберите следующее действие!\n(Открыть меню - M)" << endl << endl;
+                break;
+            }
+            case '6':
+            {
+                cout << "Вы выбрали пункт №6.\nСписок был очищен.\nВыберите следующее действие\n(Открыть меню - M)" << endl << endl;
+                list = Clear(list);
+                break;
+            }
+            case 'M':
+            case 'm':
+            case 'ь':
+            case 'Ь':
+            case 'м':
+            case 'М':
+            case 'v':
+            case 'V':
+            {
+                ChangeFont(Green);
+                MenuList();
+                break;
+            }
+			default:
+			{
+				ChangeFont(Green);
+				MenuList();
+				break;
+			}
+        }
+    }
+}
+
